@@ -121,16 +121,14 @@ try {
     exit
 }
 
-Write-Host ""
 Write-Host "Enter PID : " -NoNewline
-$pid = Read-Host
+$targetPid = Read-Host
 
 try {
-    $proc = Get-Process -Id $pid -ErrorAction Stop
+    $proc = Get-Process -Id $targetPid -ErrorAction Stop
     Write-Host "[+] Target: $($proc.ProcessName)" -ForegroundColor Green
 } catch {
     Write-Host "[-] Invalid PID" -ForegroundColor Red
-    exit
 }
 
 Write-Host ""
